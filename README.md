@@ -1,2 +1,6 @@
-# instagram_media_downloader
-Command-line program to download images and videos from a user's profile page on Instagram.
+## Instagram_Media_Downloader
+- Download all photos and videos from your friend's or favorite celebrity Instagram page with ease
+- Username and Password not needed
+
+## Requirements
+- 

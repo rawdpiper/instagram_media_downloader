@@ -14,7 +14,7 @@
 3. Add the folder where the program is located to PATH directory so that you can call the program in a short and neat way. [Click here](https://docs.alfresco.com/4.2/tasks/fot-addpath.html) to know how to add folder to PATH
 
 ## Usage
-py instagram_media_downloader.py -u USERNAME -p PATH
+`py instagram_media_downloader.py -u USERNAME -p PATH`
 
 ## Help
 ```

@@ -13,7 +13,7 @@ print_magenta   = lambda x : cprint(x, 'magenta')	#print out text in magenta col
 print_yellow    = lambda x: cprint(x, 'yellow')		#print out text in yellow color
 print_cyan      = lambda x: cprint(x, 'cyan')		#print out text in cyan color
 
-# download imaages
+# download images
 def image_downloader(edge, images_path):
 	display_url = edge['node']['display_url']
 	file_name = edge['node']['taken_at_timestamp']
@@ -42,7 +42,7 @@ def video_downloader(shortcode, videos_path):
 		print_green(str(file_name) + '.mp4 has been downloaded before')
 		print('\n')
 
-#download images and videos from posts containing more than one pictrure or videos`
+#download images and videos from posts containing more than one pictures or videos`
 def sidecar_downloader(shortcode, images_path, videos_path):
 	r = requests.get('https://www.instagram.com/p/' + shortcode + '/?__a=1')
 	num = 1

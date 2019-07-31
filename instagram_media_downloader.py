@@ -17,7 +17,7 @@ print_cyan      = lambda x: cprint(x, 'cyan')		#print out text in cyan color
 def image_downloader(edge, images_path):
 	display_url = edge['node']['display_url']
 	file_name = edge['node']['taken_at_timestamp']
-	download_path = images_path + '\\' + str(file_name) + '.jpg'
+	download_path = os.path.join(images_path, str(file_name) + '.jpg')
 	if not os.path.exists(download_path):
 		print_yellow('Downloading ' + str(file_name) + '.jpg...........')
 		urllib.request.urlretrieve(display_url, download_path)
@@ -29,10 +29,10 @@ def image_downloader(edge, images_path):
 
 # download videos	
 def video_downloader(shortcode, videos_path):
-	r = requests.get('https://www.instagram.com/p/' + shortcode + '/?__a=1')
+	r = requests.get('https://www.instagram.com/p/{sc}/?__a=1'.format(sc=shortcode))
 	video_url = r.json()['graphql']['shortcode_media']['video_url']
 	file_name = r.json()['graphql']['shortcode_media']['taken_at_timestamp']
-	download_path = videos_path + '\\' + str(file_name) + '.mp4'
+	download_path = os.path.join(videos_path, str(file_name) + '.mp4')
 	if not os.path.exists(download_path):
 		print_yellow('Downloading ' + str(file_name) + '.mp4...........')
 		urllib.request.urlretrieve(video_url, download_path)
@@ -44,14 +44,14 @@ def video_downloader(shortcode, videos_path):
 
 #download images and videos from posts containing more than one pictures or videos`
 def sidecar_downloader(shortcode, images_path, videos_path):
-	r = requests.get('https://www.instagram.com/p/' + shortcode + '/?__a=1')
+	r = requests.get('https://www.instagram.com/p/{sc}/?__a=1'.format(sc = shortcode))
 	num = 1
 	for edge in r.json()['graphql']['shortcode_media']['edge_sidecar_to_children']['edges']:
 		is_video = edge['node']['is_video']
 		if is_video == False:
 			display_url = edge['node']['display_url']
 			file_name = r.json()['graphql']['shortcode_media']['taken_at_timestamp']
-			download_path = images_path + '\\' + str(file_name) + '_' + str(num) + '.jpg'
+			download_path = os.path.join(images_path, str(file_name) + '_' + str(num) + '.jpg')
 			if not os.path.exists(download_path):
 				print_yellow('Downloading ' + str(file_name) + '_' + str(num) + '.jpg...........')
 				urllib.request.urlretrieve(display_url, download_path)
@@ -63,7 +63,7 @@ def sidecar_downloader(shortcode, images_path, videos_path):
 		else:
 			video_url = edge['node']['video_url']
 			file_name = r.json()['graphql']['shortcode_media']['taken_at_timestamp']
-			download_path = videos_path + '\\' + str(file_name) + '_' + str(num) + '.mp4'
+			download_path = os.path.join(videos_path, str(file_name) + '_' + str(num) + '.mp4')
 			if not os.path.exists(download_path):
 				print_yellow('Downloading ' + str(file_name) + '_' + str(num) + '.mp4...........')
 				urllib.request.urlretrieve(video_url, download_path)
@@ -81,13 +81,13 @@ def main(account_json_info, path):
 	end_cursor = ''
 	next_page = True
 	is_video = False
-	images_path = path + '\\Images'
-	videos_path = path + '\\Videos'
-	if os.path.exists(path) == False:
+	images_path = os.path.join(path, 'Images')
+	videos_path = os.path.join(path, 'Videos')
+	if not os.path.exists(path):
 		os.makedirs(path)
-		if os.path.exists(images_path) == False:
+		if not os.path.exists(images_path):
 			os.makedirs(images_path)
-		if os.path.exists(videos_path) == False:
+		if not os.path.exists(videos_path):
 			os.makedirs(videos_path)
 		print_magenta('User Folder Created!\n')
 	else:
@@ -104,13 +104,13 @@ def main(account_json_info, path):
 		)
 		graphql = r.json()['data']
 		for edge in graphql['user']['edge_owner_to_timeline_media']['edges']:
-			__typename = edge['node']['__typename']
-			if __typename == 'GraphImage':
+			typename = edge['node']['__typename']
+			if typename == 'GraphImage':
 				image_downloader(edge, images_path)
-			elif __typename == 'GraphVideo':
+			elif typename == 'GraphVideo':
 				shortcode = edge['node']['shortcode']
 				video_downloader(shortcode, videos_path)
-			elif __typename == 'GraphSidecar':
+			elif typename == 'GraphSidecar':
 				shortcode = edge['node']['shortcode']
 				sidecar_downloader(shortcode, images_path, videos_path)
 	
@@ -128,6 +128,6 @@ if __name__ == '__main__':
 	parser.add_argument('-u', '--user', dest = 'username', required = True, help = 'Username on Instagram')
 	parser.add_argument('-p', '--path', dest = 'path', required = True, help = 'Root path where downloaded Instagram Media is saved')
 	args = parser.parse_args()
-	account_json_info = 'https://www.instagram.com/' + args.username + '/?__a=1' #insert username into the link
-	args.path += '\\' + args.username 	#add username to the directory given
+	account_json_info = 'https://www.instagram.com/{un}/?__a=1'.format(un = args.username) #insert username into the link
+	args.path = os.path.join(args.path, args.username)	#add username to the directory given
 	main(account_json_info, args.path)
